@@ -11,7 +11,7 @@ export class SequenceMatcher {
   private bjunk: string[]
   private bpopular: string[]
   
-  constructor(isjunk: IsJunk | null = null, a: string = '', b: string ='', autojunk: boolean = true) {
+  constructor(isjunk: IsJunk | null = null, a: string = '', b: string ='', autojunk: boolean = true, opDirection: 'A2B' | 'B2A' = 'A2B') {
     if (isjunk === null) {
       this.isjunk = (chara: string) => {return false}
     } else {
@@ -23,12 +23,16 @@ export class SequenceMatcher {
     this.autojunk = autojunk
     this.matchingBlocks = []
     this.opcodes = []
-    this.opIsA2B = true
+    this.opIsA2B = opDirection === 'A2B'
     this.fullbcount = {}
     this.b2j = {}
     this.bjunk = []
     this.bpopular = []
     this.setSeqs(a, b)
+  }
+
+  public setDefaultDirection(opDirection: 'A2B' | 'B2A' = 'A2B') {
+    this.opIsA2B = opDirection === 'A2B'
   }
 
   private calculate_ratio(matches: number, length: number): number {
@@ -253,8 +257,9 @@ export class SequenceMatcher {
     }
   }
 
-  public getOpcodes(isA2B: boolean = true): Opcode[] {
-    if (isA2B) {
+  public getOpcodes(isA2B?: boolean): Opcode[] {
+    const opIsA2B = isA2B === undefined ? this.opIsA2B : isA2B
+    if (opIsA2B) {
       return this.getOpcodesA2B()
     } else {
       return this.getOpcodesB2A()
