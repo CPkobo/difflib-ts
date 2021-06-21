@@ -1,4 +1,4 @@
-declare type Optag = 'equal' | 'insert' | 'delete' | 'replace' | ''
+declare type Optag = 'equal' | 'insert' | 'delete' | 'replace' | '='| '+'| '-'| '~' |''
 declare type Opcode = [Optag, number, number, number, number]
 declare type Match = [number, number, number]
 declare type Queue = [number, number, number, number]
