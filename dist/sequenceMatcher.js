@@ -13,7 +13,7 @@ class SequenceMatcher {
     b2j;
     bjunk;
     bpopular;
-    constructor(isjunk = null, a = '', b = '', autojunk = true) {
+    constructor(isjunk = null, a = '', b = '', autojunk = true, opDirection = 'A2B') {
         if (isjunk === null) {
             this.isjunk = (chara) => { return false; };
         }
@@ -25,12 +25,15 @@ class SequenceMatcher {
         this.autojunk = autojunk;
         this.matchingBlocks = [];
         this.opcodes = [];
-        this.opIsA2B = true;
+        this.opIsA2B = opDirection === 'A2B';
         this.fullbcount = {};
         this.b2j = {};
         this.bjunk = [];
         this.bpopular = [];
         this.setSeqs(a, b);
+    }
+    setDefaultDirection(opDirection = 'A2B') {
+        this.opIsA2B = opDirection === 'A2B';
     }
     calculate_ratio(matches, length) {
         if (length > 0) {
@@ -235,8 +238,9 @@ class SequenceMatcher {
             return this.matchingBlocks;
         }
     }
-    getOpcodes(isA2B = true) {
-        if (isA2B) {
+    getOpcodes(isA2B) {
+        const opIsA2B = isA2B === undefined ? this.opIsA2B : isA2B;
+        if (opIsA2B) {
             return this.getOpcodesA2B();
         }
         else {
@@ -313,8 +317,56 @@ class SequenceMatcher {
             return answer;
         }
     }
-    // getGroupedOpcodes(n: number = 3) {
-    // } 
+    getGroupedOpcodes(n = 3) {
+        let tag;
+        let i1;
+        let i2;
+        let j1;
+        let j2;
+        let codes = this.getOpcodes();
+        if (codes.length === 0) {
+            codes = [['equal', 0, 1, 0, 1]];
+        }
+        if (codes[0][0] === 'equal') {
+            tag = codes[0][0];
+            i1 = codes[0][1];
+            i2 = codes[0][2];
+            j1 = codes[0][3];
+            j2 = codes[0][4];
+            codes[0] = [tag, Math.max(i1, i2 - n), i2, Math.max(j1, j2 - n), j2];
+        }
+        const last = codes.length - 1;
+        if (codes[last][0] === 'equal') {
+            tag = codes[last][0];
+            i1 = codes[last][1];
+            i2 = codes[last][2];
+            j1 = codes[last][3];
+            j2 = codes[last][4];
+            codes[last] = [tag, i1, Math.min(i2, i1 + n), j1, Math.min(j2, j1 + n)];
+        }
+        const nn = n + n;
+        const groups = [];
+        let group = [];
+        for (const code of codes) {
+            tag = code[0];
+            i1 = code[1];
+            i2 = code[2];
+            j1 = code[3];
+            j2 = code[4];
+            if ((tag === 'equal') && ((i2 - i1) > nn)) {
+                group.push([tag, i1, Math.min(i2, i1 + n), j1, Math.min(j2, j1 + n)]);
+                groups.push(group.slice());
+                group = [];
+                i1 = Math.max(i1, i2 - n);
+                j1 = Math.max(j1, j2 - n);
+            }
+            group.push([tag, i1, i2, j1, j2]);
+        }
+        if (group.length > 0 && !((group.length === 1) && (group[0][0] === 'equal'))) {
+            groups.push(group);
+        }
+        return groups;
+    }
     ratio() {
         let matches = 0;
         for (const m of this.getMatchingBlocks()) {
