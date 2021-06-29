@@ -14,12 +14,7 @@ class SequenceMatcher {
     bjunk;
     bpopular;
     constructor(isjunk = null, a = '', b = '', autojunk = true, opDirection = 'A2B') {
-        if (isjunk === null) {
-            this.isjunk = (chara) => { return false; };
-        }
-        else {
-            this.isjunk = isjunk;
-        }
+        this.isjunk = isjunk;
         this.a = '';
         this.b = '';
         this.autojunk = autojunk;
@@ -33,7 +28,12 @@ class SequenceMatcher {
         this.setSeqs(a, b);
     }
     setDefaultDirection(opDirection = 'A2B') {
-        this.opIsA2B = opDirection === 'A2B';
+        if (opDirection === 'A2B') {
+            this.opIsA2B = true;
+        }
+        else if (opDirection === 'B2A') {
+            this.opIsA2B = false;
+        }
     }
     calculate_ratio(matches, length) {
         if (length > 0) {
@@ -213,7 +213,7 @@ class SequenceMatcher {
             let i1 = 0;
             let j1 = 0;
             let k1 = 0;
-            const non_adjacent = [];
+            const nonAdjacent = [];
             for (const m of matchingBlocks) {
                 const i2 = m[0];
                 const j2 = m[1];
@@ -223,18 +223,18 @@ class SequenceMatcher {
                 }
                 else {
                     if (k1 > 0) {
-                        non_adjacent.push([i1, j1, k1]);
-                        i1 = i2;
-                        j1 = j2;
-                        k1 = k2;
+                        nonAdjacent.push([i1, j1, k1]);
                     }
+                    i1 = i2;
+                    j1 = j2;
+                    k1 = k2;
                 }
             }
             if (k1 > 0) {
-                non_adjacent.push([i1, j1, k1]);
+                nonAdjacent.push([i1, j1, k1]);
             }
-            non_adjacent.push([la, lb, 0]);
-            this.matchingBlocks = non_adjacent;
+            nonAdjacent.push([la, lb, 0]);
+            this.matchingBlocks = nonAdjacent;
             return this.matchingBlocks;
         }
     }

@@ -12,12 +12,8 @@ export class SequenceMatcher {
   private bpopular: string[]
   
   constructor(isjunk: IsJunk | null = null, a: string = '', b: string ='', autojunk: boolean = true, opDirection: 'A2B' | 'B2A' = 'A2B') {
-    if (isjunk === null) {
-      this.isjunk = (chara: string) => {return false}
-    } else {
-      this.isjunk = isjunk
-    }
-    
+    this.isjunk = isjunk
+        
     this.a = ''
     this.b = ''
     this.autojunk = autojunk
@@ -235,28 +231,28 @@ export class SequenceMatcher {
       let i1 = 0
       let j1 = 0
       let k1 = 0
-      const non_adjacent: Match[] = []
+      const nonAdjacent: Match[] = []
       for (const m of matchingBlocks) {
         const i2 = m[0]
         const j2 = m[1]
         const k2 = m[2]
         if ((i1 + k1 === i2) && (j1 + k1 === j2)) {
           k1 += k2
-        } else{
+        } else {
           if (k1 > 0) {
-            non_adjacent.push([i1, j1, k1])
-            i1 = i2
-            j1 = j2
-            k1 = k2
+            nonAdjacent.push([i1, j1, k1])
           }
+          i1 = i2
+          j1 = j2
+          k1 = k2
         }
       }
       if (k1 > 0) {
-        non_adjacent.push([i1, j1, k1])
+        nonAdjacent.push([i1, j1, k1])
       }
 
-      non_adjacent.push([la, lb, 0])
-      this.matchingBlocks = non_adjacent
+      nonAdjacent.push([la, lb, 0])
+      this.matchingBlocks = nonAdjacent
       return this.matchingBlocks
     }
   }
