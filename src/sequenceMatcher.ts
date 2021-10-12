@@ -227,7 +227,15 @@ export class SequenceMatcher {
         }
       }
       
-      matchingBlocks.sort()
+      matchingBlocks.sort((a: Match, b: Match) => {
+        if (a[0] > b[0]) { 
+          return 1
+        } else if (a[0] < b[0]) {
+          return -1
+        } else {
+          return 0
+        }
+      })
       let i1 = 0
       let j1 = 0
       let k1 = 0
