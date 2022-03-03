@@ -10,10 +10,10 @@ export class SequenceMatcher {
   private b2j: EltIndices
   private bjunk: string[]
   private bpopular: string[]
-  
-  constructor(isjunk: IsJunk | null = null, a: string = '', b: string ='', autojunk: boolean = true, opDirection: 'A2B' | 'B2A' = 'A2B') {
+
+  constructor(isjunk: IsJunk | null = null, a: string = '', b: string = '', autojunk: boolean = true, opDirection: 'A2B' | 'B2A' = 'A2B') {
     this.isjunk = isjunk
-        
+
     this.a = ''
     this.b = ''
     this.autojunk = autojunk
@@ -42,7 +42,7 @@ export class SequenceMatcher {
       return 1.0
     }
   }
-  
+
   private range(start: number, end: number = 0): number[] {
     let start_ = 0
     let end_ = 0
@@ -82,7 +82,7 @@ export class SequenceMatcher {
     }
   }
 
-  private _chainB(){
+  private _chainB() {
     const b = this.b
     this.b2j = {}
     for (let i = 0; i < b.length; i++) {
@@ -125,9 +125,9 @@ export class SequenceMatcher {
       }
     }
   }
-     
+
   private findLongestMatch(alo: number, ahi: number, blo: number, bhi: number): Match {
-  
+
     const a = this.a
     const b = this.b
     let besti = alo
@@ -139,7 +139,7 @@ export class SequenceMatcher {
       const elt = a[i]
       const indices = this.b2j[elt] || []
       for (const j of indices) {
-        if (j < blo){
+        if (j < blo) {
           continue
         } else if (j >= bhi) {
           break
@@ -159,19 +159,17 @@ export class SequenceMatcher {
       besti > alo &&
       bestj > blo &&
       this.bjunk.indexOf(b[bestj - 1]) !== -1 &&
-      a[besti - 1] == b[bestj - 1]) 
-    {
+      a[besti - 1] == b[bestj - 1]) {
       besti--
       bestj--
       bestsize++
     }
-    
+
     while (
-      besti+bestsize < ahi &&
-      bestj+bestsize < bhi &&
+      besti + bestsize < ahi &&
+      bestj + bestsize < bhi &&
       this.bjunk.indexOf(b[bestj + bestsize]) !== -1 &&
-      a[besti + bestsize] === b[bestj + bestsize])
-    {
+      a[besti + bestsize] === b[bestj + bestsize]) {
       bestsize++
     }
 
@@ -179,19 +177,17 @@ export class SequenceMatcher {
       besti > alo &&
       bestj > blo &&
       this.bjunk.indexOf(b[bestj - 1]) !== -1 &&
-      a[besti - 1] === b[bestj - 1])
-    {
+      a[besti - 1] === b[bestj - 1]) {
       besti--
       bestj--
       bestsize++
     }
 
     while (
-      besti+bestsize < ahi &&
-      bestj+bestsize < bhi &&
+      besti + bestsize < ahi &&
+      bestj + bestsize < bhi &&
       this.bjunk.indexOf(b[bestj + bestsize]) !== -1 &&
-      a[besti + bestsize] == b[bestj + bestsize])
-    {
+      a[besti + bestsize] == b[bestj + bestsize]) {
       bestsize++
     }
 
@@ -207,7 +203,7 @@ export class SequenceMatcher {
       const queue: Queue[] = [[0, la, 0, lb]]
       const matchingBlocks: Match[] = []
       while (queue.length > 0) {
-        const q = queue.pop() || [0,0,0,0]
+        const q = queue.pop() || [0, 0, 0, 0]
         const alo = q[0]
         const ahi = q[1]
         const blo = q[2]
@@ -215,7 +211,7 @@ export class SequenceMatcher {
         const x = this.findLongestMatch(alo, ahi, blo, bhi)
         const i = x[0]
         const j = x[1]
-        const k = x[2]        
+        const k = x[2]
         if (k > 0) {
           matchingBlocks.push(x)
           if (alo < i && blo < j) {
@@ -226,9 +222,9 @@ export class SequenceMatcher {
           }
         }
       }
-      
+
       matchingBlocks.sort((a: Match, b: Match) => {
-        if (a[0] > b[0]) { 
+        if (a[0] > b[0]) {
           return 1
         } else if (a[0] < b[0]) {
           return -1
@@ -418,7 +414,7 @@ export class SequenceMatcher {
     for (let i = 0; i < this.a.length; i++) {
       const elt = this.a[i]
       const numb = avail[elt] || this.fullbcount[elt] || 0
-      avail[elt] = numb -1
+      avail[elt] = numb - 1
       if (numb > 0) {
         matches++
       }
@@ -447,22 +443,22 @@ export class SequenceMatcher {
           break;
         case 'delete':
           tagged =
-              tagged.slice(0, processCode[3]) +
-              '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
-              tagged.slice(processCode[4]);
+            tagged.slice(0, processCode[3]) +
+            '<ins>' + crtSegment.slice(processCode[1], processCode[2]) + '</ins>' +
+            tagged.slice(processCode[4]);
           break;
         case 'replace':
           tagged =
-              tagged.slice(0, processCode[3]) +
-              '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
-              '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
-              tagged.slice(processCode[4]);
+            tagged.slice(0, processCode[3]) +
+            '<ins>' + crtSegment.slice(processCode[1], processCode[2]) + '</ins>' +
+            '<del>' + tagged.slice(processCode[3], processCode[4]) + '</del>' +
+            tagged.slice(processCode[4]);
           break;
         case 'insert':
           tagged =
-              tagged.slice(0, processCode[3]) +
-              '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
-              tagged.slice(processCode[4]);
+            tagged.slice(0, processCode[3]) +
+            '<del>' + tagged.slice(processCode[3], processCode[4]) + '</del>' +
+            tagged.slice(processCode[4]);
           break;
         default:
           break;
